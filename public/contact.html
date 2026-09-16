@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact | My Server</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply the saved theme before the page draws, so it doesn't flash
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved) document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="navbar">
+    <nav class="navbar-inner" aria-label="Main">
+      <a class="brand" href="/">My Server</a>
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact" aria-current="page">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" type="button" aria-label="Toggle dark mode"></button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Contact</h1>
+    <p>Have a question or just want to say hi? Send me a message.</p>
+
+    <form id="contact-form" class="contact-form" novalidate>
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" autocomplete="name" maxlength="100" required>
+        <p class="field-error" id="name-error"></p>
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" maxlength="200" required>
+        <p class="field-error" id="email-error"></p>
+      </div>
+
+      <div class="field">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="6" maxlength="5000" required></textarea>
+        <p class="field-error" id="message-error"></p>
+      </div>
+
+      <button type="submit" class="btn-primary">Send message</button>
+      <p id="form-status" class="form-status" role="status"></p>
+    </form>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>&copy; 2024 My Server. All rights reserved.</p>
+      <!-- Replace with your GitHub profile or repository URL -->
+      <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    // Dark mode toggle (same as the home page)
+    const toggle = document.querySelector(".theme-toggle");
+    const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function isDark() {
+      const theme = document.documentElement.dataset.theme;
+      return theme ? theme === "dark" : systemDark.matches;
+    }
+
+    function updateButton() {
+      toggle.textContent = isDark() ? "☀️" : "🌙";
+      toggle.setAttribute("aria-pressed", isDark());
+    }
+
+    toggle.addEventListener("click", () => {
+      const theme = isDark() ? "light" : "dark";
+      document.documentElement.dataset.theme = theme;
+      try {
+        localStorage.setItem("theme", theme);
+      } catch (e) {}
+      updateButton();
+    });
+
+    systemDark.addEventListener("change", updateButton);
+    updateButton();
+
+    // Contact form
+    const form = document.getElementById("contact-form");
+    const submitBtn = form.querySelector("button[type=submit]");
+    const status = document.getElementById("form-status");
+    const fields = ["name", "email", "message"];
+
+    // Look inputs up by id. (Don't use form.name: every form already has a
+    // built-in "name" property, so it wouldn't return the Name field.)
+    function getValue(field) {
+      return document.getElementById(field).value.trim();
+    }
+
+    // Returns an error message for one field, or "" if it's fine
+    function validateField(field, value) {
+      if (field === "name" && !value) return "Please enter your name.";
+      if (field === "email") {
+        if (!value) return "Please enter your email.";
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "Please enter a valid email, like you@example.com.";
+      }
+      if (field === "message" && !value) return "Please enter a message.";
+      return "";
+    }
+
+    function setFieldError(field, message) {
+      const input = document.getElementById(field);
+      const error = document.getElementById(field + "-error");
+      error.textContent = message;
+      if (message) {
+        input.setAttribute("aria-invalid", "true");
+        input.setAttribute("aria-describedby", field + "-error");
+      } else {
+        input.removeAttribute("aria-invalid");
+        input.removeAttribute("aria-describedby");
+      }
+    }
+
+    // Shows each field's error (or clears it) and focuses the first problem.
+    // Returns true if there were any errors.
+    function showErrors(errors) {
+      for (const field of fields) {
+        setFieldError(field, errors[field] || "");
+      }
+      const first = fields.find((field) => errors[field]);
+      if (first) document.getElementById(first).focus();
+      return Boolean(first);
+    }
+
+    function setStatus(message, type) {
+      status.textContent = message;
+      status.className = "form-status" + (type ? " " + type : "");
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setStatus("");
+
+      const data = {};
+      const errors = {};
+      for (const field of fields) {
+        data[field] = getValue(field);
+        const error = validateField(field, data[field]);
+        if (error) errors[field] = error;
+      }
+
+      if (showErrors(errors)) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending...";
+
+      try {
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+
+        if (!response.ok) {
+          showErrors(result.errors || {});
+          setStatus(result.error || "Please fix the errors above.", "error");
+          return;
+        }
+
+        form.reset();
+        setStatus("Thanks! Your message has been sent.", "success");
+      } catch (e) {
+        setStatus("Couldn't send your message. Is the server running?", "error");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Send message";
+      }
+    });
+
+    for (const field of fields) {
+      const input = document.getElementById(field);
+
+      // Check a field when the visitor leaves it, but don't nag about
+      // empty fields they haven't filled in yet
+      input.addEventListener("blur", () => {
+        const value = getValue(field);
+        if (value) setFieldError(field, validateField(field, value));
+      });
+
+      // Once a field shows an error, update it live as they type
+      input.addEventListener("input", () => {
+        if (input.getAttribute("aria-invalid") === "true") {
+          setFieldError(field, validateField(field, getValue(field)));
+        }
+      });
+    }
+  </script>
+</body>
+</html>

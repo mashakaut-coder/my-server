@@ -1,16 +1,72 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My First Server</title>
-  <style>
-    body { font-family: sans-serif; max-width: 600px; margin: 50px auto; }
-    h1 { color: #333; }
-  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply the saved theme before the page draws, so it doesn't flash
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved) document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
 </head>
 <body>
-  <h1>Welcome to My Server</h1>
-  <p>This page is being served by Node.js and Express.</p>
-  <p>I built this myself.</p>
+  <header class="navbar">
+    <nav class="navbar-inner" aria-label="Main">
+      <a class="brand" href="/">My Server</a>
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="/" aria-current="page">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+        <button class="theme-toggle" type="button" aria-label="Toggle dark mode"></button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Welcome to My Server</h1>
+    <p>This page is being served by Node.js and Express.</p>
+    <p>I built this myself.</p>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>&copy; 2024 My Server. All rights reserved.</p>
+      <!-- Replace with your GitHub profile or repository URL -->
+      <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.querySelector(".theme-toggle");
+    const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function isDark() {
+      const theme = document.documentElement.dataset.theme;
+      return theme ? theme === "dark" : systemDark.matches;
+    }
+
+    function updateButton() {
+      toggle.textContent = isDark() ? "☀️" : "🌙";
+      toggle.setAttribute("aria-pressed", isDark());
+    }
+
+    toggle.addEventListener("click", () => {
+      const theme = isDark() ? "light" : "dark";
+      document.documentElement.dataset.theme = theme;
+      try {
+        localStorage.setItem("theme", theme);
+      } catch (e) {}
+      updateButton();
+    });
+
+    systemDark.addEventListener("change", updateButton);
+    updateButton();
+  </script>
 </body>
 </html>
