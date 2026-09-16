@@ -1,0 +1,282 @@
+/*
+  Colors: each one is written as light-dark(LIGHT, DARK).
+  The browser picks the light or dark value based on the computer's setting.
+*/
+:root {
+  color-scheme: light dark;
+
+  --bg: light-dark(#f7f7f8, #0f1115);
+  --surface: light-dark(#ffffff, #171a21);
+  --text: light-dark(#1f2328, #e8eaed);
+  --muted: light-dark(#5b6270, #9aa1ad);
+  --border: light-dark(#d9dce1, #2f3542);
+  --accent: light-dark(#4f46e5, #8b85ff);
+  --accent-hover: light-dark(#4338ca, #a39eff);
+  --accent-soft: light-dark(#e6e8ff, #2b2b5a);
+  --on-accent: light-dark(#ffffff, #0f1115); /* Text on the submit button */
+  --danger: light-dark(#dc2626, #f87171);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.container {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 48px 16px;
+}
+
+/* Heading */
+h1 {
+  margin: 0 0 24px;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* Form card */
+.bookmark-form {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+label {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Inputs and dropdown share one look */
+input,
+select {
+  width: 100%;
+  min-height: 44px; /* Comfortable to tap on phones */
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input::placeholder {
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* Dropdown: replace the browser's arrow with one that matches the theme */
+.select-wrapper {
+  position: relative;
+}
+
+select {
+  appearance: none;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.select-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+/* Show "Choose a category" in a lighter color until a category is picked */
+select:has(option[value=""]:checked) {
+  color: var(--muted);
+}
+
+/* Submit button */
+.submit-button {
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 10px 20px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--on-accent);
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.submit-button:hover {
+  background: var(--accent-hover);
+}
+
+.submit-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Storage warning */
+.storage-warning {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--danger);
+}
+
+/* Saved bookmarks */
+.saved {
+  margin-top: 40px;
+}
+
+.saved h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+}
+
+.count {
+  min-width: 24px;
+  padding: 0 8px;
+  font-size: 0.8rem;
+  line-height: 22px;
+  text-align: center;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+}
+
+/* Search */
+.search-box {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.search-box input {
+  padding-left: 38px;
+  background: var(--surface);
+}
+
+/* Hides the search label visually but keeps it for screen readers */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Category groups */
+.bookmark-groups {
+  display: grid;
+  gap: 24px;
+}
+
+.category-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.bookmark-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bookmark {
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.bookmark-title {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  overflow-wrap: anywhere; /* Long titles wrap instead of overflowing */
+}
+
+.bookmark-title:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.bookmark-title:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.bookmark-site {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.empty-message {
+  margin: 0;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--muted);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+}
