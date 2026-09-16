@@ -42,31 +42,6 @@
     </div>
   </footer>
 
-  <script>
-    const toggle = document.querySelector(".theme-toggle");
-    const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
-
-    function isDark() {
-      const theme = document.documentElement.dataset.theme;
-      return theme ? theme === "dark" : systemDark.matches;
-    }
-
-    function updateButton() {
-      toggle.textContent = isDark() ? "☀️" : "🌙";
-      toggle.setAttribute("aria-pressed", isDark());
-    }
-
-    toggle.addEventListener("click", () => {
-      const theme = isDark() ? "light" : "dark";
-      document.documentElement.dataset.theme = theme;
-      try {
-        localStorage.setItem("theme", theme);
-      } catch (e) {}
-      updateButton();
-    });
-
-    systemDark.addEventListener("change", updateButton);
-    updateButton();
-  </script>
+  <script src="theme.js"></script>
 </body>
 </html>

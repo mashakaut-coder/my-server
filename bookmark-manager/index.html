@@ -5,12 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bookmarks</title>
   <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply the saved theme before the page draws, so it doesn't flash
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved) document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
 </head>
 <body>
   <main class="container">
     <header class="page-header">
-      <h1>Bookmarks</h1>
-      <p class="subtitle">Save links you want to come back to.</p>
+      <div>
+        <h1>Bookmarks</h1>
+        <p class="subtitle">Save links you want to come back to.</p>
+      </div>
+      <button class="theme-toggle" type="button" aria-label="Toggle dark mode"></button>
     </header>
 
     <form id="bookmark-form" class="card form" novalidate>

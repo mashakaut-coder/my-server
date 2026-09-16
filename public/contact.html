@@ -64,33 +64,8 @@
     </div>
   </footer>
 
+  <script src="theme.js"></script>
   <script>
-    // Dark mode toggle (same as the home page)
-    const toggle = document.querySelector(".theme-toggle");
-    const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
-
-    function isDark() {
-      const theme = document.documentElement.dataset.theme;
-      return theme ? theme === "dark" : systemDark.matches;
-    }
-
-    function updateButton() {
-      toggle.textContent = isDark() ? "☀️" : "🌙";
-      toggle.setAttribute("aria-pressed", isDark());
-    }
-
-    toggle.addEventListener("click", () => {
-      const theme = isDark() ? "light" : "dark";
-      document.documentElement.dataset.theme = theme;
-      try {
-        localStorage.setItem("theme", theme);
-      } catch (e) {}
-      updateButton();
-    });
-
-    systemDark.addEventListener("change", updateButton);
-    updateButton();
-
     // Contact form
     const form = document.getElementById("contact-form");
     const submitBtn = form.querySelector("button[type=submit]");

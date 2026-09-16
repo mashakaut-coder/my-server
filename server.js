@@ -2,6 +2,23 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
+const publicDir = path.join(__dirname, "public");
+
+// Tells the browser what kind of file it's getting
+const contentTypes = {
+    ".html": "text/html",
+    ".css": "text/css",
+    ".js": "text/javascript",
+    ".json": "application/json",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".svg": "image/svg+xml",
+    ".ico": "image/x-icon",
+    ".txt": "text/plain",
+};
+
 const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://" + req.headers.host);
 
@@ -127,23 +144,6 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    if (url.pathname === "/styles.css") {
-        const filePath = path.join(__dirname, "public", "styles.css");
-
-        fs.readFile(filePath, "utf8", (err, data) => {
-            if (err) {
-                res.writeHead(500, { "Content-Type": "text/plain" });
-                res.end("Server error");
-                return;
-            }
-
-            res.writeHead(200, { "Content-Type": "text/css" });
-            res.end(data);
-        });
-
-        return;
-    }
-
     if (url.pathname === "/api/time") {
         const currentTime = new Date();
 
@@ -160,6 +160,34 @@ const server = http.createServer((req, res) => {
         res.end(JSON.stringify({ message: "Hello, " + name + "!" }));
 
         return;
+    }
+
+    // Any other address: try to serve a matching file from public/
+    const contentType = contentTypes[path.extname(url.pathname).toLowerCase()];
+
+    if (req.method === "GET" && contentType) {
+        let filePath;
+        try {
+            filePath = path.join(publicDir, decodeURIComponent(url.pathname));
+        } catch (err) {
+            filePath = null;
+        }
+
+        // Only serve files inside public/, never things like /../server.js
+        if (filePath && filePath.startsWith(publicDir + path.sep)) {
+            fs.readFile(filePath, (err, data) => {
+                if (err) {
+                    res.writeHead(404, { "Content-Type": "text/plain" });
+                    res.end("Not found");
+                    return;
+                }
+
+                res.writeHead(200, { "Content-Type": contentType });
+                res.end(data);
+            });
+
+            return;
+        }
     }
 
     res.writeHead(404, { "Content-Type": "text/plain" });

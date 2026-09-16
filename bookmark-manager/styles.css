@@ -1,36 +1,30 @@
-/* Light colors (default) */
+/*
+  Colors: each one is written as light-dark(LIGHT, DARK).
+  The browser picks the light or dark value based on color-scheme below.
+*/
 :root {
-  color-scheme: light;
-  --bg: #f7f7f8;
-  --surface: #ffffff;
-  --text: #1f2328;
-  --muted: #5b6270;
-  --border: #e3e5e8;
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
-  --accent-soft: #eef0ff;
-  --danger: #dc2626;
-  --danger-soft: #fdecec;
-  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+  /* Follow the computer's light/dark setting by default */
+  color-scheme: light dark;
+
+  --bg: light-dark(#f7f7f8, #0f1115);
+  --surface: light-dark(#ffffff, #171a21);
+  --text: light-dark(#1f2328, #e8eaed);
+  --muted: light-dark(#5b6270, #9aa1ad);
+  --border: light-dark(#e3e5e8, #2a2f3a);
+  --accent: light-dark(#4f46e5, #8b85ff);
+  --accent-hover: light-dark(#4338ca, #a39eff);
+  --accent-soft: light-dark(#eef0ff, #23234a);
+  --on-accent: light-dark(#ffffff, #0f1115); /* Text on accent-colored buttons */
+  --danger: light-dark(#dc2626, #f87171);
+  --danger-soft: light-dark(#fdecec, #3a1d1d);
+  /* Cards get a soft shadow in light mode; in dark mode it's invisible */
+  --shadow-color: light-dark(rgba(16, 24, 40, 0.08), transparent);
+  --shadow: 0 1px 3px var(--shadow-color);
 }
 
-/* Dark colors: follow the computer's setting */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bg: #0f1115;
-    --surface: #171a21;
-    --text: #e8eaed;
-    --muted: #9aa1ad;
-    --border: #2a2f3a;
-    --accent: #8b85ff;
-    --accent-hover: #a39eff;
-    --accent-soft: #23234a;
-    --danger: #f87171;
-    --danger-soft: #3a1d1d;
-    --shadow: none;
-  }
-}
+/* The toggle button sets data-theme to override the computer's setting */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 
 * { box-sizing: border-box; }
 
@@ -49,6 +43,13 @@ body {
 }
 
 /* Header */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .page-header h1 {
   margin: 0;
   font-size: 2rem;
@@ -58,6 +59,31 @@ body {
 .subtitle {
   margin: 4px 0 24px;
   color: var(--muted);
+}
+
+/* Dark mode toggle */
+.theme-toggle {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.theme-toggle:hover {
+  background: var(--bg);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Card */
@@ -121,7 +147,7 @@ input[aria-invalid="true"] {
   padding: 10px 18px;
   font: inherit;
   font-weight: 600;
-  color: #fff;
+  color: var(--on-accent);
   background: var(--accent);
   border: none;
   border-radius: 8px;
@@ -131,10 +157,6 @@ input[aria-invalid="true"] {
 
 .btn-primary:hover {
   background: var(--accent-hover);
-}
-
-@media (prefers-color-scheme: dark) {
-  .btn-primary { color: #0f1115; }
 }
 
 .btn-primary:focus-visible,
