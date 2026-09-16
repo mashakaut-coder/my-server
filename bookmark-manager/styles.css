@@ -185,6 +185,30 @@ input[aria-invalid="true"] {
   border-radius: 999px;
 }
 
+/* Search */
+.search-box {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.search-box[hidden] {
+  display: none;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.search-box input {
+  padding-left: 38px;
+  background: var(--surface);
+}
+
 .bookmark-list {
   display: grid;
   gap: 8px;

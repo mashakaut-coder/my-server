@@ -8,6 +8,8 @@ const list = document.getElementById("bookmark-list");
 const count = document.getElementById("count");
 const emptyState = document.getElementById("empty-state");
 const storageWarning = document.getElementById("storage-warning");
+const searchBox = document.getElementById("search-box");
+const searchInput = document.getElementById("search");
 
 let bookmarks = loadBookmarks();
 
@@ -71,7 +73,13 @@ function clearError() {
 function render() {
   list.replaceChildren();
 
-  for (const bookmark of bookmarks) {
+  // Only show bookmarks whose title contains the search text (ignoring upper/lower case)
+  const query = searchInput.value.trim();
+  const visible = query
+    ? bookmarks.filter((bookmark) => bookmark.title.toLowerCase().includes(query.toLowerCase()))
+    : bookmarks;
+
+  for (const bookmark of visible) {
     const hostname = new URL(bookmark.url).hostname.replace(/^www\./, "");
 
     const item = document.createElement("li");
@@ -109,8 +117,17 @@ function render() {
     list.append(item);
   }
 
-  count.textContent = bookmarks.length;
-  emptyState.hidden = bookmarks.length > 0;
+  count.textContent = query ? `${visible.length} of ${bookmarks.length}` : bookmarks.length;
+
+  // No point searching an empty list
+  searchBox.hidden = bookmarks.length === 0;
+
+  if (bookmarks.length === 0) {
+    emptyState.textContent = "No bookmarks yet. Add your first one above.";
+  } else if (visible.length === 0) {
+    emptyState.textContent = `No bookmarks match "${query}".`;
+  }
+  emptyState.hidden = visible.length > 0;
 }
 
 function addBookmark(event) {
@@ -138,6 +155,8 @@ function addBookmark(event) {
   });
 
   saveBookmarks();
+  // Clear the search so the new bookmark is visible
+  searchInput.value = "";
   render();
   form.reset();
   urlInput.focus();
@@ -159,5 +178,16 @@ window.addEventListener("storage", (event) => {
 
 form.addEventListener("submit", addBookmark);
 urlInput.addEventListener("input", clearError);
+
+// Filter the list as the user types
+searchInput.addEventListener("input", render);
+
+// Escape clears the search
+searchInput.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && searchInput.value) {
+    searchInput.value = "";
+    render();
+  }
+});
 
 render();
